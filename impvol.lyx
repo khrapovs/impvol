@@ -1,0 +1,177 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Proposition
+\begin_inset Formula 
+\begin{eqnarray*}
+BS\left(S,K,\sigma,r,T\right) & = & S\Phi\left(d_{1}\right)-e^{-rT}K\Phi\left(d_{2}\right),\\
+d_{1} & = & \frac{\log\left(S/K\right)+rT}{\sigma\sqrt{T}}+\frac{1}{2}\sigma\sqrt{T},\\
+d_{2} & = & d_{1}-\sigma\sqrt{T}.
+\end{eqnarray*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+F=Se^{rT}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+X=\log\left(K/F\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+BS_{2}\left(S,K,\sigma,r,T\right)=BS_{1}\left(S,K,\sigma,r,T\right)/S=\Phi\left(d_{1}\right)-e^{X}\Phi\left(d_{2}\right),
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{eqnarray*}
+\tilde{BS}\left(X,\sigma,T\right) & = & \Phi\left(d_{1}\right)-e^{X}\Phi\left(d_{2}\right),\\
+d_{1} & = & -\frac{X}{\sigma\sqrt{T}}+\frac{1}{2}\sigma\sqrt{T},\\
+d_{2} & = & d_{1}-\sigma\sqrt{T}.
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{dS}{S}=\mu dt+\sigma dW
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\log S_{T}\sim N\left(\log S_{0}+\left(\mu-\frac{1}{2}\sigma^{2}\right)T,\sigma\sqrt{T}\right)=N\left(\alpha,\beta\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+q\left(S_{T}\right)=\sum\theta_{i}L\left(\mu_{i},\sigma_{i};S_{T}\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\log S_{T}\sim\sum\theta_{i}N\left(\log S_{0}+\left(\mu_{i}-\frac{1}{2}\sigma_{i}^{2}\right)T,\sigma_{i}\sqrt{T}\right)=\sum\theta_{i}N\left(\alpha_{i},\beta_{i}\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+e^{rT}S_{0}=ES_{T}=\sum\theta_{i}\exp\left(\alpha_{i}+\frac{1}{2}\beta_{i}^{2}\right)=\sum\theta_{i}\exp\left(\log S_{0}+\left(\mu_{i}-\frac{1}{2}\sigma_{i}^{2}\right)T+\frac{1}{2}\sigma_{i}^{2}T\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+e^{rT}S_{0}=S_{0}\sum\theta_{i}\exp\left(\mu_{i}T\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+e^{rT}-\sum\theta_{i}\exp\left(\mu_{i}T\right)=0
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+e^{rT}-a\exp\left(\mu_{1}T\right)-\left(1-a\right)\exp\left(\mu_{2}T\right)=0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document
