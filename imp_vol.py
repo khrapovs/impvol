@@ -17,14 +17,14 @@ __status__ = "Development"
 
 # Standard Normal distribution with math library only
 def Phi(x):
-    return .5 * (1. + erf(x / sqrt(2)))
+    return .5 * (1 + erf(x / sqrt(2)))
 
 
 @np.vectorize
 def BSst(X, T, sig, call):
     """Standardized Black-Scholes Function."""
     # X = log(K/S) - r*T
-    d1 = -X / (sig*sqrt(T)) + .5 * sig*sqrt(T)
+    d1 = -X / (sig*sqrt(T)) + sig*sqrt(T)/2
     d2 = d1 - sig*sqrt(T)
     if call:
         return Phi(d1) - exp(X)*Phi(d2)
@@ -42,7 +42,7 @@ def BS(S, K, T, r, sig, call):
 def impvol_st(X, T, C, cp, tol=1e-5, fcount=1e3):
     """Function to find BS Implied Vol using Bisection Method."""
 
-    sig, sig_u, sig_d = .2, 1., 1e-3
+    sig, sig_u, sig_d = .2, 1, 1e-3
     count = 0
     err = BSst(X, T, sig, cp) - C
 
@@ -75,10 +75,15 @@ def impvol(X, T, C, call):
 
     The function is already vectorized since BSst is.
 
-    Inputs:
-    X - log-forward moneyness
-    T - fraction of the year
-    C - option premium normalized by current asset price
+    Parameters
+    ----------
+    X : array
+        log-forward moneyness
+    T : array
+        fraction of the year
+    C : array
+        option premium normalized by current asset price
+
     """
 
     f = lambda sig: BSst(X, T, sig, call) - C
