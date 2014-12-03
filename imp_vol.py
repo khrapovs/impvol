@@ -1,9 +1,24 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""Black-Scholes Implied Volatility.
+
+"""
+
+from __future__ import print_function, division
+
 from math import exp, log, sqrt, erf
+from scipy.optimize import root
 import numpy as np
+
+__author__ = "Stanislav Khrapov"
+__email__ = "khrapovs@gmail.com"
+__status__ = "Development"
+
 
 # Standard Normal distribution with math library only
 def Phi(x):
-    return .5 * ( 1. + erf(x / sqrt(2)) )
+    return .5 * (1. + erf(x / sqrt(2)))
+
 
 @np.vectorize
 def BSst(X, T, sig, call):
@@ -16,44 +31,21 @@ def BSst(X, T, sig, call):
     else:
         return exp(X)*Phi(-d2) - Phi(-d1)
 
+
 @np.vectorize
 def BS(S, K, T, r, sig, call):
     """Black-Scholes Function."""
     X = log(K/S) - r*T
     return S * BSst(X, T, sig, call)
 
-# Function to find BS Implied Vol using Bisection Method
-def impvol(S, K, T, r, C, cp, tol = 1e-5, fcount = 1e3):
-    sig, sig_u, sig_d = .2, 1., 1e-3
-    count = 0
-    err = BS(S, K, T, r, sig, cp) - C
 
-    # repeat until error is sufficiently small
-    # or counter hits fcount
-    while abs(err) > tol and count < fcount:
-        if err < 0:
-            sig_d = sig
-            sig = (sig_u + sig)/2
-        else:
-            sig_u = sig
-            sig = (sig_d + sig)/2
-        
-        err = BS(S, K, T, r, sig, cp) - C
-        count += 1
-    
-    # return NA if counter hit 1000
-    if count == fcount:
-        return -1
-    else:
-        return sig
-
-def impvol_st(X, T, C, cp, tol = 1e-5, fcount = 1e3):
+def impvol_st(X, T, C, cp, tol=1e-5, fcount=1e3):
     """Function to find BS Implied Vol using Bisection Method."""
 
     sig, sig_u, sig_d = .2, 1., 1e-3
     count = 0
     err = BSst(X, T, sig, cp) - C
-    
+
     # repeat until error is sufficiently small
     # or counter hits fcount
     while abs(err) > tol and count < fcount:
@@ -63,10 +55,10 @@ def impvol_st(X, T, C, cp, tol = 1e-5, fcount = 1e3):
         else:
             sig_u = sig
             sig = (sig_d + sig)/2
-        
+
         err = BSst(X, T, sig, cp) - C
         count += 1
-    
+
     # return NA if counter hit 1000
     if count == fcount:
         return -1
@@ -76,6 +68,7 @@ def impvol_st(X, T, C, cp, tol = 1e-5, fcount = 1e3):
 # Use standard Numpy vectorization function
 # The vector size is determined by the first input
 vec_impvol_st = np.vectorize(impvol_st)
+
 
 def impvol(X, T, C, call):
     """Compute implied volatility given vector of option premium C.
@@ -88,8 +81,8 @@ def impvol(X, T, C, call):
     C - option premium normalized by current asset price
     """
 
-    f = lambda sig : BSst(X, T, sig, call) - C
-    return so.root(f, np.ones_like(C) * .2).x
+    f = lambda sig: BSst(X, T, sig, call) - C
+    return root(f, np.ones_like(C) * .2).x
 
 # Test code:
 # S - stock price
