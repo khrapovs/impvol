@@ -84,7 +84,7 @@ def impvol(X, T, C, call):
 
     Inputs:
     X - log-forward moneyness
-    T - franction of the year
+    T - fraction of the year
     C - option premium normalized by current asset price
     """
 
