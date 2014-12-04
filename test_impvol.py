@@ -58,9 +58,21 @@ class ImpVolTestCase(ut.TestCase):
 
     def test_vol_values(self):
         """Test valies of implied volatility."""
-        premium, price, strike, riskfree, maturity = .05, 1, 1, 0, .5
-        maturity, premium, call = .3, .05, True
+        premium = .024
+        price = 1
+        strike = 1
+        riskfree = .02
+        maturity = 30/365
+        call = True
         moneyness = lfmoneyness(price, strike, riskfree, maturity)
+        vol = impvol(moneyness, maturity, premium, call)
+        self.assertAlmostEqual(vol, .2, 2)
+
+        strike = [1, .95]
+        premium = [.024, .057]
+        moneyness = lfmoneyness(price, strike, riskfree, maturity)
+        vol = impvol(moneyness, maturity, premium, call)
+        np.testing.assert_array_almost_equal(vol, [.2, .2], 2)
 
 
 if __name__ == '__main__':
