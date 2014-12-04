@@ -177,8 +177,8 @@ def impvol(moneyness, maturity, premium, call):
 
     """
     args = [moneyness, maturity, premium, call]
-    error = lambda sig: BSst(moneyness, maturity, sig, call) - premium
     start = np.ones(find_largest_shape(args)) * .2
+    error = lambda vol: BSst(moneyness, maturity, vol, call) - premium
     vol = root(error, start, method='lm').x
     if vol.size == 1:
         vol = float(vol)
