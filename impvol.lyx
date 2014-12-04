@@ -68,7 +68,7 @@
 
 \begin_body
 
-\begin_layout Proposition
+\begin_layout Standard
 \begin_inset Formula 
 \begin{eqnarray*}
 BS\left(S,K,\sigma,r,T\right) & = & S\Phi\left(d_{1}\right)-e^{-rT}K\Phi\left(d_{2}\right),\\
