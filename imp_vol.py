@@ -73,10 +73,34 @@ def BSst(moneyness, maturity, vol, call):
 
 
 @np.vectorize
-def BS(S, K, T, r, sig, call):
-    """Black-Scholes Function."""
-    X = lfmoneyness(S, K, r, T)
-    return S * BSst(X, T, sig, call)
+def BS(price, strike, maturity, riskfree, vol, call):
+    """Black-Scholes function.
+
+    .. math::
+        BS\left(S,K,\sigma,r,T\right)
+            &=S\Phi\left(d_{1}\right)-e^{-rT}K\Phi\left(d_{2}\right),
+        d_{1}&=\frac{\log\left(S/K\right)+rT}{\sigma\sqrt{T}}
+            +\frac{1}{2}\sigma\sqrt{T},
+        d_{2}&=d_{1}-\sigma\sqrt{T}.
+
+    Parameters
+    ----------
+    price : float array
+        Underlying prices
+    strike : float array
+        Option strikes
+    maturity : float array
+        Fraction of the year, i.e. = 30/365
+    riskfree : float array
+        Annualized risk-free rate
+    vol : float array
+        Annualized volatility (sqrt of variance), i.e. = .15
+    call : bool array
+        Call/put flag. True for call, False for put
+
+    """
+    moneyness = lfmoneyness(price, strike, riskfree, maturity)
+    return price * BSst(moneyness, maturity, vol, call)
 
 
 def lfmoneyness(price, strike, riskfree, maturity):
@@ -137,13 +161,13 @@ def impvol(moneyness, maturity, premium, call):
     Parameters
     ----------
     moneyness : float array
-        log-forward moneyness
+        Log-forward moneyness
     maturity : float array
-        fraction of the year
+        Fraction of the year
     premium : float array
-        option premium normalized by current asset price
+        Option premium normalized by current asset price
     call : bool array
-        call/put flag. True for call, False for put
+        Call/put flag. True for call, False for put
 
     Returns
     -------
@@ -159,18 +183,3 @@ def impvol(moneyness, maturity, premium, call):
     if vol.size == 1:
         vol = float(vol)
     return vol
-
-# Test code:
-# S - stock price
-# K - strike
-# T - maturity in years
-# r - risk free rate annualized
-# market - option price
-#
-#S, K, T, r, market, cp = 1, 1, 30./365, 0, .1, 'C'
-#v = impvol(S, K, T, r, market, cp)
-#print v
-
-# Test
-# X = log(K/F)
-# v = vec_impvol_st(X, T, C/S, cp)
