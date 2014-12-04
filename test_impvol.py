@@ -8,7 +8,7 @@ from __future__ import print_function, division
 import unittest as ut
 import numpy as np
 
-from imp_vol import impvol, find_largest_shape, lfmoneyness
+from ImpVol import impvol, find_largest_shape, lfmoneyness
 
 
 class ImpVolTestCase(ut.TestCase):
