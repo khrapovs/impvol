@@ -15,7 +15,7 @@ __email__ = "khrapovs@gmail.com"
 __status__ = "Development"
 
 
-def Phi(val):
+def norm_cdf(val):
     """Standard Normal distribution with math library only.
 
     Parameters
@@ -33,7 +33,7 @@ def Phi(val):
 
 
 @np.vectorize
-def BSst(moneyness, maturity, vol, call):
+def blackscholes_norm(moneyness, maturity, vol, call):
     """Standardized Black-Scholes Function.
 
     .. math::
@@ -64,16 +64,16 @@ def BSst(moneyness, maturity, vol, call):
     """
     sqrt_matur = sqrt(maturity)
     accum_vol = vol*sqrt_matur
-    d1 = - moneyness / accum_vol + accum_vol/2
-    d2 = d1 - accum_vol
+    d1arg = - moneyness / accum_vol + accum_vol/2
+    d2arg = d1arg - accum_vol
     if call:
-        return Phi(d1) - exp(moneyness)*Phi(d2)
+        return norm_cdf(d1arg) - exp(moneyness)*norm_cdf(d2arg)
     else:
-        return exp(moneyness)*Phi(-d2) - Phi(-d1)
+        return exp(moneyness)*norm_cdf(-d2arg) - norm_cdf(-d1arg)
 
 
 @np.vectorize
-def BS(price, strike, maturity, riskfree, vol, call):
+def blackscholes(price, strike, maturity, riskfree, vol, call):
     """Black-Scholes function.
 
     .. math::
@@ -100,7 +100,7 @@ def BS(price, strike, maturity, riskfree, vol, call):
 
     """
     moneyness = lfmoneyness(price, strike, riskfree, maturity)
-    return price * BSst(moneyness, maturity, vol, call)
+    return price * blackscholes_norm(moneyness, maturity, vol, call)
 
 
 def lfmoneyness(price, strike, riskfree, maturity):
@@ -127,7 +127,7 @@ def lfmoneyness(price, strike, riskfree, maturity):
 
     """
     moneyness = (np.log(np.atleast_1d(strike) / price)
-        - np.atleast_1d(riskfree) * maturity)
+                 - np.atleast_1d(riskfree) * maturity)
     if moneyness.size == 1:
         moneyness = float(moneyness)
     return moneyness
@@ -156,7 +156,7 @@ def find_largest_shape(arrays):
 def impvol(moneyness, maturity, premium, call):
     """Compute implied volatility given vector of option premium C.
 
-    The function is already vectorized since BSst is.
+    The function is already vectorized since blackscholes_norm is.
 
     Parameters
     ----------
@@ -178,7 +178,8 @@ def impvol(moneyness, maturity, premium, call):
     """
     args = [moneyness, maturity, premium, call]
     start = np.ones(find_largest_shape(args)) * .2
-    error = lambda vol: BSst(moneyness, maturity, vol, call) - premium
+    error = lambda vol: (blackscholes_norm(moneyness, maturity, vol, call)
+                         - premium)
     vol = root(error, start, method='lm').x
     if vol.size == 1:
         vol = float(vol)
