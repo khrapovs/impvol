@@ -15,34 +15,61 @@ __email__ = "khrapovs@gmail.com"
 __status__ = "Development"
 
 
-# Standard Normal distribution with math library only
-def Phi(x):
-    return .5 * (1 + erf(x / sqrt(2)))
+def Phi(val):
+    """Standard Normal distribution with math library only.
+
+    Parameters
+    ----------
+    val : float
+        Argument of the CDF
+
+    Returns
+    -------
+    float
+        Normal CDF
+
+    """
+    return (1 + erf(val / sqrt(2))) / 2
 
 
 @np.vectorize
-def BSst(X, T, sig, call):
+def BSst(moneyness, maturity, vol, call):
     """Standardized Black-Scholes Function.
 
     .. math::
+        \tilde{BS}\left(X,\sigma,T\right)
+            &=	\Phi\left(d_{1}\right)-e^{X}\Phi\left(d_{2}\right),
+        d_{1} &= -\frac{X}{\sigma\sqrt{T}}+\frac{1}{2}\sigma\sqrt{T},
+        d_{2} &= d_{1}-\sigma\sqrt{T}.
 
+    .. math::
+        X = \log(K/S) - r*T
+
+    Parameters
+    ----------
     moneyness : float array
-        log-forward moneyness
+        Log-forward moneyness
     maturity : float array
-        fraction of the year
-    premium : float array
-        option premium normalized by current asset price
+        Fraction of the year, i.e. = 30/365
+    vol : float array
+        Annualized volatility (sqrt of variance), i.e. = .15
     call : bool array
-        call/put flag. True for call, False for put
+        Call/put flag. True for call, False for put
+
+    Returns
+    -------
+    float array
+        Option premium
 
     """
-    # X = log(K/S) - r*T
-    d1 = -X / (sig*sqrt(T)) + sig*sqrt(T)/2
-    d2 = d1 - sig*sqrt(T)
+    sqrt_matur = sqrt(maturity)
+    accum_vol = vol*sqrt_matur
+    d1 = - moneyness / accum_vol + accum_vol/2
+    d2 = d1 - accum_vol
     if call:
-        return Phi(d1) - exp(X)*Phi(d2)
+        return Phi(d1) - exp(moneyness)*Phi(d2)
     else:
-        return exp(X)*Phi(-d2) - Phi(-d1)
+        return exp(moneyness)*Phi(-d2) - Phi(-d1)
 
 
 @np.vectorize
@@ -54,6 +81,9 @@ def BS(S, K, T, r, sig, call):
 
 def lfmoneyness(price, strike, riskfree, maturity):
     """Compute log-forward moneyness.
+
+    .. math::
+        X = \log(K/S) - r*T
 
     Parameters
     ----------
