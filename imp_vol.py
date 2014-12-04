@@ -6,7 +6,7 @@
 
 from __future__ import print_function, division
 
-from math import exp, log, sqrt, erf
+from math import exp, sqrt, erf
 from scipy.optimize import root
 import numpy as np
 
@@ -22,7 +22,20 @@ def Phi(x):
 
 @np.vectorize
 def BSst(X, T, sig, call):
-    """Standardized Black-Scholes Function."""
+    """Standardized Black-Scholes Function.
+
+    .. math::
+
+    moneyness : float array
+        log-forward moneyness
+    maturity : float array
+        fraction of the year
+    premium : float array
+        option premium normalized by current asset price
+    call : bool array
+        call/put flag. True for call, False for put
+
+    """
     # X = log(K/S) - r*T
     d1 = -X / (sig*sqrt(T)) + sig*sqrt(T)/2
     d2 = d1 - sig*sqrt(T)
@@ -35,59 +48,87 @@ def BSst(X, T, sig, call):
 @np.vectorize
 def BS(S, K, T, r, sig, call):
     """Black-Scholes Function."""
-    X = log(K/S) - r*T
+    X = lfmoneyness(S, K, r, T)
     return S * BSst(X, T, sig, call)
 
 
-def impvol_st(X, T, C, cp, tol=1e-5, fcount=1e3):
-    """Function to find BS Implied Vol using Bisection Method."""
+def lfmoneyness(price, strike, riskfree, maturity):
+    """Compute log-forward moneyness.
 
-    sig, sig_u, sig_d = .2, 1, 1e-3
-    count = 0
-    err = BSst(X, T, sig, cp) - C
+    Parameters
+    ----------
+    price : float array
+        Underlying prices
+    strike : float array
+        Option strikes
+    riskfree : float array
+        Annualized risk-free rate
+    maturity : float array
+        Time horizons, in shares of the calendar year
 
-    # repeat until error is sufficiently small
-    # or counter hits fcount
-    while abs(err) > tol and count < fcount:
-        if err < 0:
-            sig_d = sig
-            sig = (sig_u + sig)/2
-        else:
-            sig_u = sig
-            sig = (sig_d + sig)/2
+    Returns
+    -------
+    float array
+        Log-forward moneyness
 
-        err = BSst(X, T, sig, cp) - C
-        count += 1
-
-    # return NA if counter hit 1000
-    if count == fcount:
-        return -1
-    else:
-        return sig
-
-# Use standard Numpy vectorization function
-# The vector size is determined by the first input
-vec_impvol_st = np.vectorize(impvol_st)
+    """
+    moneyness = (np.log(np.atleast_1d(strike) / price)
+        - np.atleast_1d(riskfree) * maturity)
+    if moneyness.size == 1:
+        moneyness = float(moneyness)
+    return moneyness
 
 
-def impvol(X, T, C, call):
+def find_largest_shape(arrays):
+    """Find largest shape among series of arrays.
+
+    Parameters
+    ----------
+    arrays : list
+        List of arrays
+
+    Returns
+    -------
+    tuple
+        Largest shape among arrays
+
+    """
+    out = np.array(0)
+    for array in arrays:
+        out = out * np.zeros_like(array)
+    return out.shape
+
+
+def impvol(moneyness, maturity, premium, call):
     """Compute implied volatility given vector of option premium C.
 
     The function is already vectorized since BSst is.
 
     Parameters
     ----------
-    X : array
+    moneyness : float array
         log-forward moneyness
-    T : array
+    maturity : float array
         fraction of the year
-    C : array
+    premium : float array
         option premium normalized by current asset price
+    call : bool array
+        call/put flag. True for call, False for put
+
+    Returns
+    -------
+    float or float array
+        Implied volatilities.
+        Shape of the array is according to broadcasting rules.
 
     """
-
-    f = lambda sig: BSst(X, T, sig, call) - C
-    return root(f, np.ones_like(C) * .2).x
+    args = [moneyness, maturity, premium, call]
+    error = lambda sig: BSst(moneyness, maturity, sig, call) - premium
+    start = np.ones(find_largest_shape(args)) * .2
+    vol = root(error, start, method='lm').x
+    if vol.size == 1:
+        vol = float(vol)
+    return vol
 
 # Test code:
 # S - stock price
