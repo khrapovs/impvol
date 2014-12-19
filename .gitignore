@@ -24,3 +24,4 @@
 *.npy
 *.token
 .ipynb_checkpoints
+build/

@@ -37,7 +37,7 @@ def norm_cdf(val):
 
 @np.vectorize
 def blackscholes_norm(moneyness, maturity, vol, call):
-    """Standardized Black-Scholes Function.
+    r"""Standardized Black-Scholes Function.
 
     .. math::
         \tilde{BS}\left(X,\sigma,T\right)
@@ -77,7 +77,7 @@ def blackscholes_norm(moneyness, maturity, vol, call):
 
 @np.vectorize
 def blackscholes(price, strike, maturity, riskfree, vol, call):
-    """Black-Scholes function.
+    r"""Black-Scholes function.
 
     .. math::
         BS\left(S,K,\sigma,r,T\right)
@@ -107,7 +107,7 @@ def blackscholes(price, strike, maturity, riskfree, vol, call):
 
 
 def lfmoneyness(price, strike, riskfree, maturity):
-    """Compute log-forward moneyness.
+    r"""Compute log-forward moneyness.
 
     .. math::
         X = \log(K/S) - r*T
