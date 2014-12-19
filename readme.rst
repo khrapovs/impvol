@@ -1,5 +1,5 @@
-.. image:: https://travis-ci.org/khrapovs/ImpVol.svg
-    :target: https://travis-ci.org/khrapovs/ImpVol
+.. image:: https://travis-ci.org/khrapovs/impvol.svg
+    :target: https://travis-ci.org/khrapovs/impvol
     
 ImpVol
 ======
