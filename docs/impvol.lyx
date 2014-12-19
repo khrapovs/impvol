@@ -69,6 +69,7 @@
 \begin_body
 
 \begin_layout Standard
+The original Black-Scholes formula is given by
 \begin_inset Formula 
 \begin{eqnarray*}
 BS\left(S,K,\sigma,r,T\right) & = & S\Phi\left(d_{1}\right)-e^{-rT}K\Phi\left(d_{2}\right),\\
@@ -78,41 +79,29 @@ d_{2} & = & d_{1}-\sigma\sqrt{T}.
 
 \end_inset
 
-
-\begin_inset Formula 
-\[
-F=Se^{rT}
-\]
-
+After normalization by the current asset price 
+\begin_inset Formula $S$
 \end_inset
 
-
-\begin_inset Formula 
-\[
-X=\log\left(K/F\right)
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-BS_{2}\left(S,K,\sigma,r,T\right)=BS_{1}\left(S,K,\sigma,r,T\right)/S=\Phi\left(d_{1}\right)-e^{X}\Phi\left(d_{2}\right),
-\]
-
-\end_inset
-
-
+ it can be written as 
 \begin_inset Formula 
 \begin{eqnarray*}
 \tilde{BS}\left(X,\sigma,T\right) & = & \Phi\left(d_{1}\right)-e^{X}\Phi\left(d_{2}\right),\\
 d_{1} & = & -\frac{X}{\sigma\sqrt{T}}+\frac{1}{2}\sigma\sqrt{T},\\
-d_{2} & = & d_{1}-\sigma\sqrt{T}.
+d_{2} & = & d_{1}-\sigma\sqrt{T},
 \end{eqnarray*}
 
 \end_inset
 
+where 
+\begin_inset Formula $X=\log\left(K/F\right)$
+\end_inset
 
+ is log-forward moneyness, and forward price is given by 
+\begin_inset Formula $F=Se^{rT}$
+\end_inset
+
+.
 \end_layout
 
 \end_body

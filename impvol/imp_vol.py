@@ -1,6 +1,28 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Black-Scholes Implied Volatility.
+r"""
+Black-Scholes Implied Volatility
+================================
+
+The original Black-Scholes formula is given by
+
+.. math::
+    BS\left(S,K,\sigma,r,T\right)
+        &=S\Phi\left(d_{1}\right)-e^{-rT}K\Phi\left(d_{2}\right),\\
+    d_{1}&=\frac{\log\left(S/K\right)+rT}{\sigma\sqrt{T}}
+        +\frac{1}{2}\sigma\sqrt{T},\\
+    d_{2}&=d_{1}-\sigma\sqrt{T}.
+
+After normalization by the current asset price :math:`S` it can be written as
+
+.. math::
+    \tilde{BS}\left(X,\sigma,T\right)
+        &=\Phi\left(d_{1}\right)-e^{X}\Phi\left(d_{2}\right),\\
+    d_{1}&=-\frac{X}{\sigma\sqrt{T}}+\frac{1}{2}\sigma\sqrt{T},\\
+    d_{2}&=d_{1}-\sigma\sqrt{T},
+
+where :math:`X=\log\left(K/F\right)` is log-forward moneyness,
+and forward price is given by :math:`F=Se^{rT}`.
 
 """
 
