@@ -28,100 +28,70 @@ and forward price is given by :math:`F=Se^{rT}`.
 
 from __future__ import print_function, division
 
-from math import exp, sqrt, erf
 from scipy.optimize import root
+from scipy.stats import norm
 import numpy as np
 
 __author__ = "Stanislav Khrapov"
 __email__ = "khrapovs@gmail.com"
-__status__ = "Development"
 
 __all__ = ['impvol', 'find_largest_shape',
            'lfmoneyness', 'blackscholes_norm']
 
 
-def norm_cdf(val):
-    """Standard Normal distribution with math library only.
-
-    Parameters
-    ----------
-    val : float
-        Argument of the CDF
-
-    Returns
-    -------
-    float
-        Normal CDF
-
-    """
-    return (1 + erf(val / sqrt(2))) / 2
-
-
-@np.vectorize
 def blackscholes_norm(moneyness, maturity, vol, call):
-    r"""Standardized Black-Scholes Function.
-
-    .. math::
-        \tilde{BS}\left(X,\sigma,T\right)
-            &=	\Phi\left(d_{1}\right)-e^{X}\Phi\left(d_{2}\right),
-        d_{1} &= -\frac{X}{\sigma\sqrt{T}}+\frac{1}{2}\sigma\sqrt{T},
-        d_{2} &= d_{1}-\sigma\sqrt{T}.
-
-    .. math::
-        X = \log(K/S) - r*T
+    """Standardized Black-Scholes Function.
 
     Parameters
     ----------
-    moneyness : float array
+    moneyness : array_like
         Log-forward moneyness
-    maturity : float array
+    maturity : array_like
         Fraction of the year, i.e. = 30/365
-    vol : float array
+    vol : array_like
         Annualized volatility (sqrt of variance), i.e. = .15
-    call : bool array
+    call : bool array_like
         Call/put flag. True for call, False for put
 
     Returns
     -------
-    float array
-        Option premium
+    array_like
+        Option premium standardized by current asset price
 
     """
-    sqrt_matur = sqrt(maturity)
-    accum_vol = vol*sqrt_matur
-    d1arg = - moneyness / accum_vol + accum_vol/2
+    accum_vol = np.atleast_1d(vol)*np.atleast_1d(maturity)**.5
+    d1arg = - np.atleast_1d(moneyness) / accum_vol + accum_vol/2
     d2arg = d1arg - accum_vol
-    if call:
-        return norm_cdf(d1arg) - exp(moneyness)*norm_cdf(d2arg)
-    else:
-        return exp(moneyness)*norm_cdf(-d2arg) - norm_cdf(-d1arg)
+    out1 = norm.cdf(d1arg) - np.exp(moneyness)*norm.cdf(d2arg)
+    out2 = np.exp(moneyness)*norm.cdf(-d2arg) - norm.cdf(-d1arg)
+    premium = out1 * call + out2 * np.logical_not(call)
+    if premium.size == 1:
+        return float(premium)
+    return premium
 
 
-@np.vectorize
 def blackscholes(price, strike, maturity, riskfree, vol, call):
-    r"""Black-Scholes function.
-
-    .. math::
-        BS\left(S,K,\sigma,r,T\right)
-            &=S\Phi\left(d_{1}\right)-e^{-rT}K\Phi\left(d_{2}\right),
-        d_{1}&=\frac{\log\left(S/K\right)+rT}{\sigma\sqrt{T}}
-            +\frac{1}{2}\sigma\sqrt{T},
-        d_{2}&=d_{1}-\sigma\sqrt{T}.
+    """Black-Scholes function.
 
     Parameters
     ----------
-    price : float array
+    price : array_like
         Underlying prices
-    strike : float array
+    strike : array_like
         Option strikes
-    maturity : float array
+    maturity : array_like
         Fraction of the year, i.e. = 30/365
-    riskfree : float array
+    riskfree : array_like
         Annualized risk-free rate
-    vol : float array
+    vol : array_like
         Annualized volatility (sqrt of variance), i.e. = .15
-    call : bool array
+    call : bool array_like
         Call/put flag. True for call, False for put
+
+    Returns
+    -------
+    array_like
+        Option premium
 
     """
     moneyness = lfmoneyness(price, strike, riskfree, maturity)
@@ -129,30 +99,27 @@ def blackscholes(price, strike, maturity, riskfree, vol, call):
 
 
 def lfmoneyness(price, strike, riskfree, maturity):
-    r"""Compute log-forward moneyness.
-
-    .. math::
-        X = \log(K/S) - r*T
+    """Compute log-forward moneyness.
 
     Parameters
     ----------
-    price : float array
+    price : array_like
         Underlying prices
-    strike : float array
+    strike : array_like
         Option strikes
-    riskfree : float array
+    riskfree : array_like
         Annualized risk-free rate
-    maturity : float array
+    maturity : array_like
         Time horizons, in shares of the calendar year
 
     Returns
     -------
-    float array
+    array_like
         Log-forward moneyness
 
     """
-    moneyness = (np.log(np.atleast_1d(strike) / price)
-                 - np.atleast_1d(riskfree) * maturity)
+    moneyness = np.log(strike) -np.log(price)\
+        - np.atleast_1d(riskfree) * maturity
     if moneyness.size == 1:
         moneyness = float(moneyness)
     return moneyness
@@ -179,24 +146,22 @@ def find_largest_shape(arrays):
 
 
 def impvol(moneyness, maturity, premium, call):
-    """Compute implied volatility given vector of option premium C.
-
-    The function is already vectorized since blackscholes_norm is.
+    """Compute implied volatility given vector of option premium.
 
     Parameters
     ----------
-    moneyness : float array
+    moneyness : array_like
         Log-forward moneyness
-    maturity : float array
+    maturity : array_like
         Fraction of the year
-    premium : float array
+    premium : array_like
         Option premium normalized by current asset price
-    call : bool array
+    call : bool array_like
         Call/put flag. True for call, False for put
 
     Returns
     -------
-    float or float array
+    array_like
         Implied volatilities.
         Shape of the array is according to broadcasting rules.
 

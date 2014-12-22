@@ -6,7 +6,5 @@
 .. toctree::
    :maxdepth: 1
 
-.. automodule:: impvol.imp_vol
-
-.. automodule:: impvol
+.. automodule:: impvol.impvol
 	:members: impvol, lfmoneyness, blackscholes_norm
