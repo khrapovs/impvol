@@ -4,6 +4,9 @@ r"""
 Black-Scholes Implied Volatility
 ================================
 
+Introduction
+------------
+
 The original Black-Scholes formula is given by
 
 .. math::
@@ -23,6 +26,23 @@ After normalization by the current asset price :math:`S` it can be written as
 
 where :math:`X=\log\left(K/F\right)` is log-forward moneyness,
 and forward price is given by :math:`F=Se^{rT}`.
+
+Examples
+--------
+>>> from impvol import impvol, lfmoneyness
+>>> strike = [1, .95]
+>>> premium = [.024, .057]
+>>> price = 1
+>>> riskfree = .02
+>>> maturity = 30/365
+>>> call = True
+>>> moneyness = lfmoneyness(price, strike, riskfree, maturity)
+>>> vol = impvol(moneyness, maturity, premium, call)
+>>> print(vol)
+[ 0.20277309  0.20093061]
+
+Functions
+---------
 
 """
 
