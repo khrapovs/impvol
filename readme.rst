@@ -5,9 +5,7 @@
 	:target: https://readthedocs.org/projects/impvol/?badge=latest
 	:alt: Documentation Status
 
-ImpVol
-======
-
-Find Black-Scholes implied volatility
+Black-Scholes Implied Volatility
+================================
 
 `Documentation <http://impvol.readthedocs.org/en/latest/>`_
