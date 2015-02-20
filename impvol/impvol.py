@@ -138,7 +138,7 @@ def lfmoneyness(price, strike, riskfree, maturity):
         Log-forward moneyness
 
     """
-    moneyness = np.log(strike) -np.log(price)\
+    moneyness = np.log(strike) - np.log(price) \
         - np.atleast_1d(riskfree) * maturity
     if moneyness.size == 1:
         moneyness = float(moneyness)
