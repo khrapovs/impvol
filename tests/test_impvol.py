@@ -8,7 +8,7 @@ from __future__ import print_function, division
 import unittest as ut
 import numpy as np
 
-from impvol import impvol, find_largest_shape, lfmoneyness
+from .. import imp_vol, find_largest_shape, lfmoneyness
 
 
 class ImpVolTestCase(ut.TestCase):
@@ -48,11 +48,11 @@ class ImpVolTestCase(ut.TestCase):
         """Test correctness of types."""
 
         moneyness, maturity, premium, call = 0, .3, .05, True
-        vol = impvol(moneyness, maturity, premium, call)
+        vol = imp_vol(moneyness, maturity, premium, call)
         self.assertIsInstance(vol, float)
 
         moneyness, maturity, premium, call = [-.1, .1], .3, .05, True
-        vol = impvol(moneyness, maturity, premium, call)
+        vol = imp_vol(moneyness, maturity, premium, call)
         self.assertIsInstance(vol, np.ndarray)
         self.assertEqual(vol.shape, (2,))
 
@@ -65,13 +65,13 @@ class ImpVolTestCase(ut.TestCase):
         maturity = 30/365
         call = True
         moneyness = lfmoneyness(price, strike, riskfree, maturity)
-        vol = impvol(moneyness, maturity, premium, call)
+        vol = imp_vol(moneyness, maturity, premium, call)
         self.assertAlmostEqual(vol, .2, 2)
 
         strike = [1, .95]
         premium = [.024, .057]
         moneyness = lfmoneyness(price, strike, riskfree, maturity)
-        vol = impvol(moneyness, maturity, premium, call)
+        vol = imp_vol(moneyness, maturity, premium, call)
         np.testing.assert_array_almost_equal(vol, [.2, .2], 2)
 
 

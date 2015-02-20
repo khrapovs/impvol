@@ -29,7 +29,7 @@ and forward price is given by :math:`F=Se^{rT}`.
 
 Examples
 --------
->>> from impvol import impvol, lfmoneyness
+>>> from impvol import imp_vol, lfmoneyness
 >>> strike = [1, .95]
 >>> premium = [.024, .057]
 >>> price = 1
@@ -37,7 +37,7 @@ Examples
 >>> maturity = 30/365
 >>> call = True
 >>> moneyness = lfmoneyness(price, strike, riskfree, maturity)
->>> vol = impvol(moneyness, maturity, premium, call)
+>>> vol = imp_vol(moneyness, maturity, premium, call)
 >>> print(vol)
 [ 0.20277309  0.20093061]
 
@@ -55,7 +55,7 @@ import numpy as np
 __author__ = "Stanislav Khrapov"
 __email__ = "khrapovs@gmail.com"
 
-__all__ = ['impvol', 'find_largest_shape',
+__all__ = ['imp_vol', 'find_largest_shape',
            'lfmoneyness', 'blackscholes_norm']
 
 
@@ -165,7 +165,7 @@ def find_largest_shape(arrays):
     return out.shape
 
 
-def impvol(moneyness, maturity, premium, call):
+def imp_vol(moneyness, maturity, premium, call):
     """Compute implied volatility given vector of option premium.
 
     Parameters
