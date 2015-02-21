@@ -56,7 +56,7 @@ __author__ = "Stanislav Khrapov"
 __email__ = "khrapovs@gmail.com"
 
 __all__ = ['imp_vol', 'find_largest_shape',
-           'lfmoneyness', 'blackscholes_norm']
+           'lfmoneyness', 'strike_from_moneyness', 'blackscholes_norm']
 
 
 def blackscholes_norm(moneyness, maturity, vol, call):
@@ -87,7 +87,8 @@ def blackscholes_norm(moneyness, maturity, vol, call):
     premium = out1 * call + out2 * np.logical_not(call)
     if premium.size == 1:
         return float(premium)
-    return premium
+    else:
+        return premium
 
 
 def blackscholes(price, strike, maturity, riskfree, vol, call):
@@ -138,11 +139,38 @@ def lfmoneyness(price, strike, riskfree, maturity):
         Log-forward moneyness
 
     """
-    moneyness = np.log(strike) - np.log(price) \
-        - np.atleast_1d(riskfree) * maturity
-    if moneyness.size == 1:
-        moneyness = float(moneyness)
-    return moneyness
+    moneyness = np.log(strike) - np.log(price) - riskfree * maturity
+    if np.array(moneyness).size == 1:
+        return float(moneyness)
+    else:
+        return moneyness
+
+
+def strike_from_moneyness(price, moneyness, riskfree, maturity):
+    """Compute strike from log-forward moneyness.
+
+    Parameters
+    ----------
+    price : array_like
+        Underlying prices
+    moneyness : array_like
+        Log-forward moneyness
+    riskfree : array_like
+        Annualized risk-free rate
+    maturity : array_like
+        Time horizons, in shares of the calendar year
+
+    Returns
+    -------
+    array_like
+        Option strikes
+
+    """
+    strike = price * np.exp(moneyness) * np.exp(riskfree * maturity)
+    if np.array(strike).size == 1:
+        return float(strike)
+    else:
+        return strike
 
 
 def find_largest_shape(arrays):
@@ -191,6 +219,12 @@ def imp_vol(moneyness, maturity, premium, call):
     error = lambda vol: (blackscholes_norm(moneyness, maturity, vol, call)
                          - premium)
     vol = root(error, start, method='lm').x
-    if vol.size == 1:
-        vol = float(vol)
-    return vol
+    if np.array(vol).size == 1:
+        return float(vol)
+    else:
+        return vol
+
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()

@@ -8,7 +8,8 @@ from __future__ import print_function, division
 import unittest as ut
 import numpy as np
 
-from ..impvol import imp_vol, find_largest_shape, lfmoneyness
+from ..impvol import (imp_vol, find_largest_shape, lfmoneyness,
+                      strike_from_moneyness)
 
 
 class ImpVolTestCase(ut.TestCase):
@@ -28,7 +29,7 @@ class ImpVolTestCase(ut.TestCase):
         self.assertEqual(find_largest_shape([x, y]), (2, 3))
 
     def test_moneyness(self):
-        """Test conversion t moneyness."""
+        """Test conversion to moneyness."""
 
         price, strike, riskfree, time = 1, 1, 0, .5
         moneyness = lfmoneyness(price, strike, riskfree, time)
@@ -43,6 +44,23 @@ class ImpVolTestCase(ut.TestCase):
         price = [1, np.e]
         moneyness = lfmoneyness(price, strike, riskfree, time)
         np.testing.assert_array_equal(moneyness, np.array([0, -1]))
+
+    def test_strikes(self):
+        """Test conversion of moneyness to strike."""
+
+        price, moneyness, riskfree, time = 1, 0, 0, .5
+        strike = strike_from_moneyness(price, moneyness, riskfree, time)
+        self.assertEqual(strike, 1)
+
+        price, riskfree, time = 1, 0, .5
+        moneyness = [1, 0]
+        strike = strike_from_moneyness(price, moneyness, riskfree, time)
+        np.testing.assert_array_equal(strike, np.array([np.e, 1]))
+
+        moneyness, riskfree, time = 0, 0, .5
+        price = [1, 2]
+        strike = strike_from_moneyness(price, moneyness, riskfree, time)
+        np.testing.assert_array_equal(strike, np.array([1, 2]))
 
     def test_vol_types(self):
         """Test correctness of types."""
