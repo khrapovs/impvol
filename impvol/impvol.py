@@ -29,17 +29,19 @@ and forward price is given by :math:`F=Se^{rT}`.
 
 Examples
 --------
->>> from impvol import imp_vol, lfmoneyness
->>> strike = [1, .95]
->>> premium = [.024, .057]
->>> price = 1
->>> riskfree = .02
->>> maturity = 30/365
->>> call = True
->>> moneyness = lfmoneyness(price, strike, riskfree, maturity)
->>> vol = imp_vol(moneyness, maturity, premium, call)
->>> print(vol)
-[ 0.20277309  0.20093061]
+.. doctest::
+
+    >>> from impvol import imp_vol, lfmoneyness
+    >>> strike = [1, .95]
+    >>> premium = [.024, .057]
+    >>> price = 1
+    >>> riskfree = .02
+    >>> maturity = 30/365
+    >>> call = True
+    >>> moneyness = lfmoneyness(price, strike, riskfree, maturity)
+    >>> vol = imp_vol(moneyness, maturity, premium, call)
+    >>> print(vol)
+    [ 0.20277309  0.20093061]
 
 Functions
 ---------
