@@ -50,9 +50,10 @@ Functions
 
 from __future__ import print_function, division
 
+import numpy as np
+
 from scipy.optimize import root
 from scipy.stats import norm
-import numpy as np
 
 __author__ = "Stanislav Khrapov"
 __email__ = "khrapovs@gmail.com"
