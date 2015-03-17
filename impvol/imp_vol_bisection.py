@@ -6,14 +6,34 @@
 
 import numpy as np
 
-from imp_vol import BSst
+from impvol import blackscholes_norm
 
-def impvol_st(X, T, C, cp, tol=1e-5, fcount=1e3):
-    """Function to find BS Implied Vol using Bisection Method."""
+
+def impvol_bisection(moneyness, maturity, premium, call, tol=1e-5, fcount=1e3):
+    """Function to find BS Implied Vol using Bisection Method.
+
+    Parameters
+    ----------
+    moneyness : float
+        Log-forward moneyness
+    maturity : float
+        Fraction of the year
+    premium : float
+        Option premium normalized by current asset price
+    call : bool
+        Call/put flag. True for call, False for put
+
+    Returns
+    -------
+    float
+        Implied volatilities.
+        Shape of the array is according to broadcasting rules.
+
+    """
 
     sig, sig_u, sig_d = .2, 1, 1e-3
     count = 0
-    err = BSst(X, T, sig, cp) - C
+    err = blackscholes_norm(moneyness, maturity, sig, call) - premium
 
     # repeat until error is sufficiently small
     # or counter hits fcount
@@ -25,7 +45,7 @@ def impvol_st(X, T, C, cp, tol=1e-5, fcount=1e3):
             sig_u = sig
             sig = (sig_d + sig)/2
 
-        err = BSst(X, T, sig, cp) - C
+        err = blackscholes_norm(moneyness, maturity, sig, call) - premium
         count += 1
 
     # return NA if counter hit 1000
@@ -36,4 +56,4 @@ def impvol_st(X, T, C, cp, tol=1e-5, fcount=1e3):
 
 # Use standard Numpy vectorization function
 # The vector size is determined by the first input
-vec_impvol_st = np.vectorize(impvol_st)
+vec_impvol_st = np.vectorize(impvol_bisection)
