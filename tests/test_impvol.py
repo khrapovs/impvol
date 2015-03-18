@@ -8,8 +8,8 @@ from __future__ import print_function, division
 import unittest as ut
 import numpy as np
 
-from ..impvol import (imp_vol, find_largest_shape, lfmoneyness,
-                      strike_from_moneyness)
+from impvol import (imp_vol, find_largest_shape, lfmoneyness,
+                    impvol_bisection, strike_from_moneyness)
 
 
 class ImpVolTestCase(ut.TestCase):
@@ -18,7 +18,7 @@ class ImpVolTestCase(ut.TestCase):
     def test_shape_finder(self):
         """Test largest shape finding function."""
         x, y = 0, 0
-        self.assertEqual(find_largest_shape([x, y]), ())
+        self.assertEqual(find_largest_shape([x, y]), (1,))
         x, y = 0, [0, 0]
         self.assertEqual(find_largest_shape([x, y]), (2,))
         x = [0, 0]
@@ -75,7 +75,7 @@ class ImpVolTestCase(ut.TestCase):
         self.assertEqual(vol.shape, (2,))
 
     def test_vol_values(self):
-        """Test valies of implied volatility."""
+        """Test values of implied volatility."""
         premium = .024
         price = 1
         strike = 1
@@ -90,6 +90,24 @@ class ImpVolTestCase(ut.TestCase):
         premium = [.024, .057]
         moneyness = lfmoneyness(price, strike, riskfree, maturity)
         vol = imp_vol(moneyness, maturity, premium, call)
+        np.testing.assert_array_almost_equal(vol, [.2, .2], 2)
+
+    def test_bisection(self):
+        """Test values of implied volatility (bisection method)."""
+        premium = .024
+        price = 1
+        strike = 1
+        riskfree = .02
+        maturity = 30/365
+        call = True
+        moneyness = lfmoneyness(price, strike, riskfree, maturity)
+        vol = impvol_bisection(moneyness, maturity, premium, call)
+        self.assertAlmostEqual(float(vol), .2, 2)
+
+        strike = [1, .95]
+        premium = [.024, .057]
+        moneyness = lfmoneyness(price, strike, riskfree, maturity)
+        vol = impvol_bisection(moneyness, maturity, premium, call)
         np.testing.assert_array_almost_equal(vol, [.2, .2], 2)
 
 

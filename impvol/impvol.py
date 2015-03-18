@@ -42,6 +42,9 @@ Examples
     >>> vol = imp_vol(moneyness, maturity, premium, call)
     >>> print(vol)
     [ 0.20277309  0.20093061]
+    >>> vol = impvol_bisection(moneyness, maturity, premium, call)
+    >>> print(vol)
+    [ 0.20270996  0.20095215]
 
 Functions
 ---------
@@ -50,7 +53,6 @@ Functions
 from __future__ import print_function, division
 
 import numpy as np
-import numba as nb
 
 from scipy.optimize import root
 from scipy.stats import norm
@@ -58,7 +60,7 @@ from scipy.stats import norm
 __author__ = "Stanislav Khrapov"
 __email__ = "khrapovs@gmail.com"
 
-__all__ = ['imp_vol', 'find_largest_shape', 'impvol_bisection_vec',
+__all__ = ['imp_vol', 'find_largest_shape', 'impvol_bisection',
            'lfmoneyness', 'strike_from_moneyness', 'blackscholes_norm']
 
 
@@ -213,24 +215,50 @@ def imp_vol(moneyness, maturity, premium, call):
         Implied volatilities.
         Shape of the array is according to broadcasting rules.
 
+    Notes
+    -----
+    This code relies on SciPy root method. Although vectorized, it is still
+    very slow. Bisection method in this impvol library is substantially
+    faster.
+
     """
     args = [moneyness, maturity, premium, call]
     start = np.ones(find_largest_shape(args)) * .2
-    error = lambda vol: (blackscholes_norm(moneyness, maturity, vol, call)
-                         - premium)
-    vol = root(error, start, method='lm').x
+    vol = root(lambda vol: error_iv(vol, moneyness, maturity, premium, call),
+               start, method='lm').x
     if np.array(vol).size == 1:
         return float(vol)
     else:
         return vol
 
 
-def error_iv(sigma, moneyness, maturity, call, premium):
+def error_iv(sigma, moneyness, maturity, premium, call):
+    """Pricing error.
+
+    Parameters
+    ----------
+    sigma : array_like
+        Volatility
+    moneyness : array_like
+        Log-forward moneyness
+    maturity : array_like
+        Fraction of the year
+    premium : array_like
+        Option premium normalized by current asset price
+    call : array_like bool
+        Call/put flag. True for call, False for put
+
+    Returns
+    -------
+    array_like
+        Implied volatilities.
+        Shape of the array is according to broadcasting rules.
+
+    """
     return blackscholes_norm(moneyness, maturity, sigma, call) - premium
 
 
-def impvol_bisection_vec(moneyness, maturity,
-                         premium, call, tol=1e-5, fcount=1e3):
+def impvol_bisection(moneyness, maturity, premium, call, tol=1e-5, fcount=1e3):
     """Function to find BS Implied Vol using Bisection Method.
 
     Parameters
@@ -253,24 +281,22 @@ def impvol_bisection_vec(moneyness, maturity,
     """
     args = [moneyness, maturity, premium, call]
     size = find_largest_shape(args)
-    sigma = np.ones(size) * .1
+    sigma = np.ones(size) * .2
     sigma_u = np.ones(size) * .5
     sigma_d = np.ones(size) * 1e-3
 
     count = 0
     error = [tol + 1]
 
-    # repeat until error is sufficiently small
-    # or counter hits fcount
+    # repeat until error is sufficiently small or counter hits fcount
     while np.max(np.abs(error)) > tol and count < fcount:
 
-        error = error_iv(sigma, moneyness, maturity, call, premium)
+        error = error_iv(sigma, moneyness, maturity, premium, call)
 
         sigma_u[error >= 0] = sigma[error >= 0]
         sigma_d[error < 0] = sigma[error < 0]
 
-        sigma[error >= 0] += sigma_d[error >= 0]
-        sigma[error < 0] += sigma_u[error < 0]
+        sigma += sigma_d * (error >= 0) + sigma_u * (error < 0)
 
         sigma /= 2
 
