@@ -255,7 +255,7 @@ def error_iv(sigma, moneyness, maturity, premium, call):
         Shape of the array is according to broadcasting rules.
 
     """
-    return blackscholes_norm(moneyness, maturity, sigma, call) - premium
+    return blackscholes_norm(moneyness, maturity, sigma, call) / premium - 1
 
 
 def impvol_bisection(moneyness, maturity, premium, call, tol=1e-5, fcount=1e3):
@@ -282,14 +282,14 @@ def impvol_bisection(moneyness, maturity, premium, call, tol=1e-5, fcount=1e3):
     args = [moneyness, maturity, premium, call]
     size = find_largest_shape(args)
     sigma = np.ones(size) * .2
-    sigma_u = np.ones(size) * .5
+    sigma_u = np.ones(size)
     sigma_d = np.ones(size) * 1e-3
 
     count = 0
     error = [tol + 1]
 
     # repeat until error is sufficiently small or counter hits fcount
-    while np.max(np.abs(error)) > tol and count < fcount:
+    while np.max(np.absolute(error)) > tol and count < fcount:
 
         error = error_iv(sigma, moneyness, maturity, premium, call)
 
@@ -302,11 +302,7 @@ def impvol_bisection(moneyness, maturity, premium, call, tol=1e-5, fcount=1e3):
 
         count += 1
 
-    # return NA if counter hit 1000
-    if count == fcount:
-        return -1
-    else:
-        return sigma
+    return sigma
 
 
 if __name__ == '__main__':
