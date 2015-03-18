@@ -54,6 +54,7 @@ def impvol_bisection(moneyness, maturity, premium, call, tol=1e-5, fcount=1e3):
     else:
         return sig
 
+
 # Use standard Numpy vectorization function
 # The vector size is determined by the first input
 vec_impvol_st = np.vectorize(impvol_bisection)

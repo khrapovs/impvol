@@ -47,10 +47,10 @@ Functions
 ---------
 
 """
-
 from __future__ import print_function, division
 
 import numpy as np
+import numba as nb
 
 from scipy.optimize import root
 from scipy.stats import norm
@@ -58,7 +58,7 @@ from scipy.stats import norm
 __author__ = "Stanislav Khrapov"
 __email__ = "khrapovs@gmail.com"
 
-__all__ = ['imp_vol', 'find_largest_shape',
+__all__ = ['imp_vol', 'find_largest_shape', 'impvol_bisection_vec',
            'lfmoneyness', 'strike_from_moneyness', 'blackscholes_norm']
 
 
@@ -88,10 +88,7 @@ def blackscholes_norm(moneyness, maturity, vol, call):
     out1 = norm.cdf(d1arg) - np.exp(moneyness)*norm.cdf(d2arg)
     out2 = np.exp(moneyness)*norm.cdf(-d2arg) - norm.cdf(-d1arg)
     premium = out1 * call + out2 * np.logical_not(call)
-    if premium.size == 1:
-        return float(premium)
-    else:
-        return premium
+    return premium
 
 
 def blackscholes(price, strike, maturity, riskfree, vol, call):
@@ -190,7 +187,7 @@ def find_largest_shape(arrays):
         Largest shape among arrays
 
     """
-    out = np.array(0)
+    out = np.array([0])
     for array in arrays:
         out = out * np.zeros_like(array)
     return out.shape
@@ -226,6 +223,64 @@ def imp_vol(moneyness, maturity, premium, call):
         return float(vol)
     else:
         return vol
+
+
+def error_iv(sigma, moneyness, maturity, call, premium):
+    return blackscholes_norm(moneyness, maturity, sigma, call) - premium
+
+
+def impvol_bisection_vec(moneyness, maturity,
+                         premium, call, tol=1e-5, fcount=1e3):
+    """Function to find BS Implied Vol using Bisection Method.
+
+    Parameters
+    ----------
+    moneyness : array_like
+        Log-forward moneyness
+    maturity : array_like
+        Fraction of the year
+    premium : array_like
+        Option premium normalized by current asset price
+    call : array_like bool
+        Call/put flag. True for call, False for put
+
+    Returns
+    -------
+    array_like
+        Implied volatilities.
+        Shape of the array is according to broadcasting rules.
+
+    """
+    args = [moneyness, maturity, premium, call]
+    size = find_largest_shape(args)
+    sigma = np.ones(size) * .1
+    sigma_u = np.ones(size) * .5
+    sigma_d = np.ones(size) * 1e-3
+
+    count = 0
+    error = [tol + 1]
+
+    # repeat until error is sufficiently small
+    # or counter hits fcount
+    while np.max(np.abs(error)) > tol and count < fcount:
+
+        error = error_iv(sigma, moneyness, maturity, call, premium)
+
+        sigma_u[error >= 0] = sigma[error >= 0]
+        sigma_d[error < 0] = sigma[error < 0]
+
+        sigma[error >= 0] += sigma_d[error >= 0]
+        sigma[error < 0] += sigma_u[error < 0]
+
+        sigma /= 2
+
+        count += 1
+
+    # return NA if counter hit 1000
+    if count == fcount:
+        return -1
+    else:
+        return sigma
 
 
 if __name__ == '__main__':
