@@ -258,7 +258,8 @@ def error_iv(sigma, moneyness, maturity, premium, call):
     return blackscholes_norm(moneyness, maturity, sigma, call) / premium - 1
 
 
-def impvol_bisection(moneyness, maturity, premium, call, tol=1e-5, fcount=1e3):
+def impvol_bisection(moneyness, maturity, premium, call,
+                     tol=1e-5, fcount=1000):
     """Function to find BS Implied Vol using Bisection Method.
 
     Parameters
