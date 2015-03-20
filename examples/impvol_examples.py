@@ -8,8 +8,10 @@ from __future__ import print_function, division
 import time
 
 import numpy as np
+import pandas as pd
 
-from impvol import imp_vol, impvol_bisection, lfmoneyness, blackscholes_norm
+from impvol import (imp_vol, impvol_bisection, lfmoneyness, blackscholes_norm,
+                    impvol_table)
 
 
 if __name__ == '__main__':
@@ -42,3 +44,10 @@ if __name__ == '__main__':
     print('Relative difference (percent) = ', ((sigma/vol-1).max()*100))
     print(np.allclose(vol, sigma, rtol=1e-3))
     print(text % (time.time() - time_start))
+
+    table = pd.DataFrame({'premium': premium, 'moneyness': moneyness})
+    table['maturity'] = maturity
+    table['call'] = call
+
+    table['imp_vol'] = impvol_table(table)
+    print(table.head())
