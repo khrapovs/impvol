@@ -60,7 +60,7 @@ from scipy.stats import norm
 __author__ = "Stanislav Khrapov"
 __email__ = "khrapovs@gmail.com"
 
-__all__ = ['imp_vol', 'find_largest_shape', 'impvol_bisection',
+__all__ = ['imp_vol', 'find_largest_shape', 'impvol_bisection', 'impvol_table',
            'lfmoneyness', 'strike_from_moneyness', 'blackscholes_norm']
 
 
@@ -276,7 +276,7 @@ def impvol_bisection(moneyness, maturity, premium, call,
     Returns
     -------
     array_like
-        Implied volatilities.
+        Implied volatilities
         Shape of the array is according to broadcasting rules.
 
     """
@@ -304,6 +304,32 @@ def impvol_bisection(moneyness, maturity, premium, call,
         count += 1
 
     return sigma
+
+
+def impvol_table(data):
+    """Implied volatility for structured data.
+
+    Parameters
+    ----------
+    data : pandas DataFrame, record array, or dictionary of arrays
+        Mandatory labels: moneyness, maturity, premium, call
+
+    Returns
+    -------
+    array
+        Implied volatilities
+
+    Notes
+    -----
+    'premium' should be normalized by the current asset price.
+
+    """
+    try:
+        data = data.to_records()
+    except:
+        pass
+    return impvol_bisection(data['moneyness'], data['maturity'],
+                            data['premium'], data['call'])
 
 
 if __name__ == '__main__':
