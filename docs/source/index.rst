@@ -7,4 +7,4 @@
    :maxdepth: 1
 
 .. automodule:: impvol.impvol
-	:members: imp_vol, impvol_bisection, lfmoneyness, blackscholes_norm
+	:members: imp_vol, impvol_bisection, impvol_table, lfmoneyness, blackscholes_norm
