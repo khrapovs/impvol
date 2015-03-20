@@ -156,6 +156,7 @@ class ImpVolTestCase(ut.TestCase):
                'maturity': maturity, 'call': call}
         dct['imp_vol'] = impvol_table(dct)
         self.assertIsInstance(dct, dict)
+        np.testing.assert_array_almost_equal(dct['imp_vol'], sigma, 5)
 
 
 if __name__ == '__main__':
