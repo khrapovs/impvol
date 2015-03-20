@@ -141,11 +141,7 @@ def lfmoneyness(price, strike, riskfree, maturity):
         Log-forward moneyness
 
     """
-    moneyness = np.log(strike) - np.log(price) - riskfree * maturity
-    if np.array(moneyness).size == 1:
-        return float(moneyness)
-    else:
-        return moneyness
+    return np.log(strike) - np.log(price) - riskfree * maturity
 
 
 def strike_from_moneyness(price, moneyness, riskfree, maturity):
@@ -168,11 +164,7 @@ def strike_from_moneyness(price, moneyness, riskfree, maturity):
         Option strikes
 
     """
-    strike = price * np.exp(moneyness) * np.exp(riskfree * maturity)
-    if np.array(strike).size == 1:
-        return float(strike)
-    else:
-        return strike
+    return price * np.exp(moneyness) * np.exp(riskfree * maturity)
 
 
 def find_largest_shape(arrays):
@@ -224,12 +216,9 @@ def imp_vol(moneyness, maturity, premium, call):
     """
     args = [moneyness, maturity, premium, call]
     start = np.ones(find_largest_shape(args)) * .2
-    vol = root(lambda vol: error_iv(vol, moneyness, maturity, premium, call),
-               start, method='lm').x
-    if np.array(vol).size == 1:
-        return float(vol)
-    else:
-        return vol
+    out = root(lambda vol: error_iv(vol, moneyness, maturity, premium, call),
+               start, method='lm')
+    return out.x
 
 
 def error_iv(sigma, moneyness, maturity, premium, call):
@@ -293,14 +282,10 @@ def impvol_bisection(moneyness, maturity, premium, call,
     while np.max(np.absolute(error)) > tol and count < fcount:
 
         error = error_iv(sigma, moneyness, maturity, premium, call)
-
         sigma_u[error >= 0] = sigma[error >= 0]
         sigma_d[error < 0] = sigma[error < 0]
-
         sigma += sigma_d * (error >= 0) + sigma_u * (error < 0)
-
         sigma /= 2
-
         count += 1
 
     return sigma
