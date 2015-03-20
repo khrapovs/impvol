@@ -152,6 +152,11 @@ class ImpVolTestCase(ut.TestCase):
         self.assertIsInstance(table, pd.DataFrame)
         np.testing.assert_array_almost_equal(table['imp_vol'].values, sigma, 5)
 
+        dct = {'premium': premium, 'moneyness': moneyness,
+               'maturity': maturity, 'call': call}
+        dct['imp_vol'] = impvol_table(dct)
+        self.assertIsInstance(dct, dict)
+
 
 if __name__ == '__main__':
     ut.main()
