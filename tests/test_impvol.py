@@ -76,7 +76,8 @@ class ImpVolTestCase(ut.TestCase):
         moneyness, maturity, premium, call = 0, .3, .05, True
         vol = imp_vol(moneyness, maturity, premium, call)
 
-        self.assertIsInstance(vol, float)
+        self.assertIsInstance(vol, np.ndarray)
+        self.assertEqual(vol.shape, (1,))
 
         moneyness, maturity, premium, call = [-.1, .1], .3, .05, True
         vol = imp_vol(moneyness, maturity, premium, call)
@@ -95,7 +96,7 @@ class ImpVolTestCase(ut.TestCase):
         moneyness = lfmoneyness(price, strike, riskfree, maturity)
         vol = imp_vol(moneyness, maturity, premium, call)
 
-        self.assertAlmostEqual(vol, .2, 2)
+        self.assertAlmostEqual(float(vol), .2, 2)
 
         strike = [1, .95]
         premium = [.024, .057]
