@@ -244,7 +244,11 @@ def error_iv(sigma, moneyness, maturity, premium, call):
         Shape of the array is according to broadcasting rules.
 
     """
-    return blackscholes_norm(moneyness, maturity, sigma, call) / premium - 1
+    # TODO : read below
+    # An alternative would be to minimize the relative error:
+    # blackscholes_norm(moneyness, maturity, sigma, call) / premium - 1
+    # But in that case some premia may be zero. What then?
+    return blackscholes_norm(moneyness, maturity, sigma, call) - premium
 
 
 def impvol_bisection(moneyness, maturity, premium, call,
