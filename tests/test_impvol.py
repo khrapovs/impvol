@@ -135,7 +135,7 @@ class ImpVolTestCase(ut.TestCase):
         premium = blackscholes_norm(moneyness, maturity, sigma, call)
         vol = impvol_bisection(moneyness, maturity, premium, call)
 
-        np.testing.assert_array_almost_equal(vol, sigma, 5)
+        np.testing.assert_array_almost_equal(vol, sigma, 3)
 
     def test_pandas(self):
         """Test with pandas input."""
@@ -151,13 +151,13 @@ class ImpVolTestCase(ut.TestCase):
         table['imp_vol'] = impvol_table(table)
 
         self.assertIsInstance(table, pd.DataFrame)
-        np.testing.assert_array_almost_equal(table['imp_vol'].values, sigma, 5)
+        np.testing.assert_array_almost_equal(table['imp_vol'].values, sigma, 3)
 
         dct = {'premium': premium, 'moneyness': moneyness,
                'maturity': maturity, 'call': call}
         dct['imp_vol'] = impvol_table(dct)
         self.assertIsInstance(dct, dict)
-        np.testing.assert_array_almost_equal(dct['imp_vol'], sigma, 5)
+        np.testing.assert_array_almost_equal(dct['imp_vol'], sigma, 3)
 
 
 if __name__ == '__main__':
