@@ -61,7 +61,8 @@ __author__ = "Stanislav Khrapov"
 __email__ = "khrapovs@gmail.com"
 
 __all__ = ['imp_vol', 'find_largest_shape', 'impvol_bisection', 'impvol_table',
-           'lfmoneyness', 'strike_from_moneyness', 'blackscholes_norm']
+           'lfmoneyness', 'strike_from_moneyness',
+           'blackscholes_norm', 'blackscholes']
 
 
 def blackscholes_norm(moneyness, maturity, vol, call):

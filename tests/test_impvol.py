@@ -9,7 +9,15 @@ import unittest as ut
 import numpy as np
 import pandas as pd
 
-from impvol import (imp_vol, find_largest_shape, lfmoneyness,
+import sys
+import os
+
+PACKAGE_PARENT = '..'
+SCRIPT_DIR = os.path.dirname(
+    os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
+sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
+
+from impvol.impvol import (imp_vol, find_largest_shape, lfmoneyness,
                     blackscholes_norm, impvol_table,
                     impvol_bisection, strike_from_moneyness)
 
