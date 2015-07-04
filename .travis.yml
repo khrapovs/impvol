@@ -20,6 +20,8 @@ before_install:
 # Install packages
 install:
   - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy scipy pandas nose
+  - python setup.py build
+  - python setup.py install
 
 # Run test
 script:
