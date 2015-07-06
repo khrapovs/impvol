@@ -1,7 +1,6 @@
 **Copyright (c) 2015 Stanislav Khrapov**
 
-Developed by: Stanislav Khrapov (<khrapovs@gmail.com>,  
-<khrapovs@gmail.com>)
+Developed by: Stanislav Khrapov (<khrapovs@gmail.com>)
 [https://sites.google.com/site/khrapovs](https://sites.google.com/site/khrapovs)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
