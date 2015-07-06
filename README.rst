@@ -8,4 +8,14 @@
 Black-Scholes Implied Volatility
 ================================
 
+Documentation
+-------------
+
 `Documentation <http://impvol.readthedocs.org/en/latest/>`_
+
+Installation
+------------
+
+::
+
+  pip install git+git://github.com/khrapovs/impvol
