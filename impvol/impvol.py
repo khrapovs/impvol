@@ -85,11 +85,11 @@ def blackscholes_norm(moneyness, maturity, vol, call):
         Option premium standardized by current asset price
 
     """
-    accum_vol = np.atleast_1d(vol)*np.atleast_1d(maturity)**.5
-    d1arg = - np.atleast_1d(moneyness) / accum_vol + accum_vol/2
+    accum_vol = np.atleast_1d(vol) * np.atleast_1d(maturity)**.5
+    d1arg = - np.atleast_1d(moneyness) / accum_vol + accum_vol / 2
     d2arg = d1arg - accum_vol
-    out1 = norm.cdf(d1arg) - np.exp(moneyness)*norm.cdf(d2arg)
-    out2 = np.exp(moneyness)*norm.cdf(-d2arg) - norm.cdf(-d1arg)
+    out1 = norm.cdf(d1arg) - np.exp(moneyness) * norm.cdf(d2arg)
+    out2 = np.exp(moneyness) * norm.cdf(-d2arg) - norm.cdf(-d1arg)
     premium = out1 * call + out2 * np.logical_not(call)
     return premium
 
@@ -277,14 +277,14 @@ def impvol_bisection(moneyness, maturity, premium, call,
     args = [moneyness, maturity, premium, call]
     size = find_largest_shape(args)
     sigma = np.ones(size) * .2
-    sigma_u = np.ones(size)
+    sigma_u = np.ones(size) * 2
     sigma_d = np.ones(size) * 1e-3
 
     count = 0
     error = [tol + 1]
 
     # repeat until error is sufficiently small or counter hits fcount
-    while np.max(np.absolute(error)) > tol and count < fcount:
+    while np.absolute(error).any() > tol and count < fcount:
 
         error = error_iv(sigma, moneyness, maturity, premium, call)
         sigma_u[error >= 0] = sigma[error >= 0]
