@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 
 from impvol import (imp_vol, find_largest_shape, lfmoneyness,
-                    blackscholes_norm, impvol_table,
+                    blackscholes_norm, impvol_table, impvol_secant,
                     impvol_bisection, strike_from_moneyness)
 
 
@@ -122,6 +122,26 @@ class ImpVolTestCase(ut.TestCase):
         premium = [.024, .057]
         moneyness = lfmoneyness(price, strike, riskfree, maturity)
         vol = impvol_bisection(moneyness, maturity, premium, call)
+
+        np.testing.assert_array_almost_equal(vol, [.2, .2], 2)
+
+    def test_secant(self):
+        """Test values of implied volatility (secant method)."""
+        premium = .024
+        price = 1
+        strike = 1
+        riskfree = .02
+        maturity = 30/365
+        call = True
+        moneyness = lfmoneyness(price, strike, riskfree, maturity)
+        vol = impvol_secant(moneyness, maturity, premium, call)
+
+        self.assertAlmostEqual(float(vol), .2, 2)
+
+        strike = [1, .95]
+        premium = [.024, .057]
+        moneyness = lfmoneyness(price, strike, riskfree, maturity)
+        vol = impvol_secant(moneyness, maturity, premium, call)
 
         np.testing.assert_array_almost_equal(vol, [.2, .2], 2)
 

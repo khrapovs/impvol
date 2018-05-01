@@ -60,7 +60,8 @@ from scipy.stats import norm
 __author__ = "Stanislav Khrapov"
 __email__ = "khrapovs@gmail.com"
 
-__all__ = ['imp_vol', 'find_largest_shape', 'impvol_bisection', 'impvol_table',
+__all__ = ['imp_vol', 'find_largest_shape', 'impvol_bisection',
+           'impvol_secant', 'impvol_table',
            'lfmoneyness', 'strike_from_moneyness',
            'blackscholes_norm', 'blackscholes']
 
@@ -284,7 +285,7 @@ def impvol_bisection(moneyness, maturity, premium, call,
     error = [tol + 1]
 
     # repeat until error is sufficiently small or counter hits fcount
-    while np.absolute(error).any() > tol and count < fcount:
+    while (np.absolute(error) > tol).any() and count < fcount:
 
         error = error_iv(sigma, moneyness, maturity, premium, call)
         sigma_u[error >= 0] = sigma[error >= 0]
@@ -293,6 +294,54 @@ def impvol_bisection(moneyness, maturity, premium, call,
         sigma /= 2
         count += 1
 
+    return sigma
+
+
+def impvol_secant(moneyness, maturity, premium, call,
+                     tol=1e-5, fcount=1000):
+    """Function to find BS Implied Vol using Secant Method.
+
+    Parameters
+    ----------
+    moneyness : array_like
+        Log-forward moneyness
+    maturity : array_like
+        Fraction of the year
+    premium : array_like
+        Option premium normalized by current asset price
+    call : array_like bool
+        Call/put flag. True for call, False for put
+
+    Returns
+    -------
+    array_like
+        Implied volatilities
+        Shape of the array is according to broadcasting rules.
+
+    Notes
+    -----
+    Method description: https://en.wikipedia.org/wiki/Secant_method
+    
+    """
+    args = [moneyness, maturity, premium, call]
+    size = find_largest_shape(args)
+    sigma = np.ones(size) * .2
+
+    count = 0
+    error = [tol + 1]
+
+    sigma0 = sigma * .1
+    fx0 = error.copy()
+    
+    # repeat until error is sufficiently small or counter hits fcount
+    while (np.absolute(error) > tol).any() and count < fcount:
+
+        error = error_iv(sigma, moneyness, maturity, premium, call)
+        sigma2 = (sigma0 * error - sigma * fx0) / (error - fx0)
+        sigma0, sigma  = sigma, sigma2
+        fx0 = error
+        count += 1
+    
     return sigma
 
 
