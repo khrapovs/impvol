@@ -65,7 +65,7 @@ class ImpVolTestCase(ut.TestCase):
         np.testing.assert_array_equal(strike, np.array([np.e, 1]))
 
         moneyness, riskfree, time = 0, 0, .5
-        price = [1, 2]
+        price = np.array([1, 2])
         strike = strike_from_moneyness(price, moneyness, riskfree, time)
 
         np.testing.assert_array_equal(strike, np.array([1, 2]))
